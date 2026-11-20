@@ -190,7 +190,7 @@ final class LogViewerModel: ObservableObject {
         queue.async { [weak self] in
             let updates = readers.map { $0.poll() }
             let earlier = readers.contains { $0.canLoadEarlier }
-            DispatchQueue.main.async {
+            DispatchQueue.main.async { [weak self] in
                 MainActor.assumeIsolated {
                     guard let self else { return }
                     self.pollInFlight = false
@@ -264,7 +264,7 @@ final class LogViewerModel: ObservableObject {
         queue.async { [weak self] in
             let batches = readers.map { $0.canLoadEarlier ? $0.loadEarlier(maxBytes: share) : [] }
             let more = readers.contains { $0.canLoadEarlier }
-            DispatchQueue.main.async {
+            DispatchQueue.main.async { [weak self] in
                 MainActor.assumeIsolated {
                     guard let self else { return }
                     self.loadingEarlier = false
@@ -296,7 +296,7 @@ final class LogViewerModel: ObservableObject {
         let ids = sources.map(\.serviceID)
         queue.async { [weak self] in
             ids.forEach { store.clear(serviceID: $0) }
-            DispatchQueue.main.async {
+            DispatchQueue.main.async { [weak self] in
                 MainActor.assumeIsolated {
                     guard let self else { return }
                     self.generation += 1
@@ -348,7 +348,7 @@ final class LogViewerModel: ObservableObject {
             if readers.indices.contains(row.stream) { marks.append((readers[row.stream], row.position)) }
             if seen.count == readers.count { break }
         }
-        queue.async { marks.forEach { $0.0.forgetBefore($0.1) } }
+        queue.async { [marks] in marks.forEach { $0.0.forgetBefore($0.1) } }
         if droppedVisible > 0 { onChange?(.droppedFront(droppedVisible)) }
     }
 
@@ -392,7 +392,7 @@ final class LogViewerModel: ObservableObject {
             let current = DispatchQueue.main.sync { MainActor.assumeIsolated { self?.filterGeneration } }
             guard current == started else { return }
             let result = snapshot.filter(matcher)
-            DispatchQueue.main.async {
+            DispatchQueue.main.async { [weak self] in
                 MainActor.assumeIsolated {
                     guard let self, started == self.filterGeneration, version == self.rowsVersion else { return }
                     // Rows that arrived (or were dropped) while filtering are reconciled here.

@@ -80,7 +80,7 @@ public final class AppModel: ObservableObject {
         }
         DispatchQueue.global(qos: .userInitiated).async { [weak self] in
             let captured = shellEnvironment()
-            DispatchQueue.main.async {
+            DispatchQueue.main.async { [weak self] in
                 guard let self else { return }
                 if captured == nil {
                     self.banner = "Could not read your login shell environment (\(LoginShellEnvironment.userShell())); commands use the app environment, so tools set up in your shell profile may not be found."

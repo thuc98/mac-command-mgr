@@ -72,8 +72,8 @@ public final class AppServiceLoginItem: LoginItemManaging {
         switch SMAppService.mainApp.status {
         case .enabled: return .enabled
         case .requiresApproval: return .requiresApproval
-        case .notRegistered: return .disabled
-        case .notFound: return .unavailable("app not found by macOS")
+        // macOS can report .notFound before the first registration.
+        case .notRegistered, .notFound: return .disabled
         @unknown default: return .disabled
         }
     }
