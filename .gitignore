@@ -1,0 +1,19 @@
+# Swift Package Manager and generated app bundles
+/.build/
+/.swiftpm/
+/build/
+
+# Xcode local state
+DerivedData/
+xcuserdata/
+*.xcuserstate
+
+# macOS metadata
+.DS_Store
+._*
+
+# Local environment files
+.env
+.env.*
+!.env.example
+!.env.sample
